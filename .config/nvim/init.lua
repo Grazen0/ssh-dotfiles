@@ -54,12 +54,6 @@ vim.keymap.set('x', 'ie', ':<C-u>normal! ggVG<CR>')
 -- Better redo
 keyset('n', 'U', '<C-r>')
 
--- Window navigation
-keyset('n', '<C-h>', '<C-w>h')
-keyset('n', '<C-j>', '<C-w>j')
-keyset('n', '<C-k>', '<C-w>k')
-keyset('n', '<C-l>', '<C-w>l')
-
 -- Window positioning
 keyset('n', '<A-h>', '<C-w>H')
 keyset('n', '<A-j>', '<C-w>J')
@@ -79,12 +73,6 @@ keyset('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true })
 -- n/N always move forwards/backwards, respectively
 keyset('n', 'n', 'v:searchforward ? "n" : "N"', { expr = true })
 keyset('n', 'N', 'v:searchforward ? "N" : "n"', { expr = true })
-
--- Floating diagnostic window
-keyset('n', '<leader>d', vim.diagnostic.open_float)
-
--- Spell quick fix
-keyset('i', '<C-l>', '<C-g>u<Esc>[s1z=`]a<C-g>u')
 
 -- Restore cursor position on buffer enter
 vim.api.nvim_create_autocmd('BufReadPost', {
@@ -156,76 +144,13 @@ require('lazy').setup({
     opts = {},
   },
   {
-    'nvim-telescope/telescope.nvim',
-    event = 'VimEnter',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      {
-        'nvim-telescope/telescope-fzf-native.nvim',
-        build = 'make',
-        cond = function()
-          return vim.fn.executable 'make' == 1
-        end,
-      },
-      { 'nvim-telescope/telescope-ui-select.nvim' },
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
-    },
-    config = function()
-      require('telescope').setup {
-        extensions = {
-          ['ui-select'] = {
-            require('telescope.themes').get_dropdown(),
-          },
-        },
-      }
-
-      pcall(require('telescope').load_extension, 'fzf')
-      pcall(require('telescope').load_extension, 'ui-select')
-
-      local builtin = require 'telescope.builtin'
-      vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
-      vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
-      vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-      vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
-      vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
-      vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
-      vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-      vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
-
-      vim.keymap.set('n', '<leader>/', function()
-        builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
-          winblend = 10,
-          previewer = false,
-        })
-      end, { desc = '[/] Fuzzily search in current buffer' })
-
-      vim.keymap.set('n', '<leader>s/', function()
-        builtin.live_grep {
-          grep_open_files = true,
-          prompt_title = 'Live Grep in Open Files',
-        }
-      end, { desc = '[S]earch [/] in Open Files' })
-
-      -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set('n', '<leader>sn', function()
-        builtin.find_files { cwd = vim.fn.stdpath 'config' }
-      end, { desc = '[S]earch [N]eovim files' })
-    end,
-  },
-  {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' },
       auto_install = true,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
+      highlight = { enable = true },
+      indent = { enable = true },
     },
   },
   {
@@ -261,24 +186,21 @@ require('lazy').setup({
           -- Custom window separator line
           WinSeparator = { link = 'LineNr' },
   
-          -- Dark completion background
-          Pmenu = {
-            fg = theme.ui.shade0,
-            bg = theme.ui.bg,
-            blend = vim.o.pumblend,
-          },
-          PmenuExtra = { fg = theme.syn.comment, bg = theme.ui.bg },
-          PmenuSel = { fg = 'none', bg = theme.ui.bg_p2 },
-          PmenuSbar = { bg = theme.ui.bg_m1 },
-          PmenuThumb = { bg = theme.ui.bg_p2 },
+          -- -- Dark completion background
+          -- Pmenu = {
+          --   fg = theme.ui.shade0,
+          --   bg = theme.ui.bg,
+          --   blend = vim.o.pumblend,
+          -- },
+          -- PmenuExtra = { fg = theme.syn.comment, bg = theme.ui.bg },
+          -- PmenuSel = { fg = 'none', bg = theme.ui.bg_p2 },
+          -- PmenuSbar = { bg = theme.ui.bg_m1 },
+          -- PmenuThumb = { bg = theme.ui.bg_p2 },
   
-          -- Transparent floating windows
-          NormalFloat = { bg = 'none' },
-          FloatBorder = { bg = 'none' },
-          FloatTitle = { bg = 'none' },
-  
-          -- Tint background of diagnostic messages with their foreground color
-          DiagnosticVirtualTextHint = make_bg_blended_color(theme.diag.hint), DiagnosticVirtualTextInfo = make_bg_blended_color(theme.diag.info), DiagnosticVirtualTextWarn = make_bg_blended_color(theme.diag.warning), DiagnosticVirtualTextError = make_bg_blended_color(theme.diag.error),
+          -- -- Transparent floating windows
+          -- NormalFloat = { bg = 'none' },
+          -- FloatBorder = { bg = 'none' },
+          -- FloatTitle = { bg = 'none' },
         }
       end,
     },
@@ -344,13 +266,6 @@ require('lazy').setup({
         desc = 'Find with grep',
       },
       {
-        '<leader>ft',
-        function()
-          require('snacks').picker.pick({ source = 'todo_comments' })
-        end,
-        desc = 'Find todo comments',
-      },
-      {
         'gd',
         function()
           require('snacks').picker.lsp_definitions()
@@ -382,97 +297,13 @@ require('lazy').setup({
     opts = {
       bigfile = { enabled = true },
       quickfile = { enabled = true },
-      lazygit = {
-        enabled = true,
-        win = { border = 'single' },
-      },
+      lazygit = { enabled = true },
       indent = {
         enabled = true,
         scope = { hl = 'SignColumn' },
         animate = { enabled = false },
       },
-      picker = {
-        enable = true,
-        win = {
-          list = {
-            keys = {
-              -- Mostly for file explorer
-              ['w'] = { { 'pick_win', 'jump' }, mode = { 'n', 'i' } },
-            },
-          },
-        },
-        layouts = {
-          default = {
-            layout = {
-              box = 'horizontal',
-              width = 0.8,
-              min_width = 120,
-              height = 0.8,
-              {
-                box = 'vertical',
-                border = 'single',
-                title = '{title} {live} {flags}',
-                { win = 'input', height = 1, border = 'bottom' },
-                { win = 'list', border = 'none' },
-              },
-              {
-                win = 'preview',
-                title = '{preview}',
-                border = 'single',
-                width = 0.5,
-              },
-            },
-          },
-          sidebar = {
-            preview = 'main',
-            layout = {
-              backdrop = false,
-              width = 40,
-              min_width = 40,
-              height = 0,
-              position = 'left',
-              border = 'none',
-              box = 'vertical',
-              {
-                win = 'input',
-                height = 1,
-                border = 'single',
-                title = '{title} {live} {flags}',
-                title_pos = 'center',
-              },
-              { win = 'list', border = 'none' },
-              {
-                win = 'preview',
-                title = '{preview}',
-                height = 0.4,
-                border = 'top',
-              },
-            },
-          },
-          select = {
-            preview = false,
-            layout = {
-              backdrop = false,
-              width = 0.5,
-              min_width = 80,
-              height = 0.4,
-              min_height = 3,
-              box = 'vertical',
-              border = 'single',
-              title = '{title}',
-              title_pos = 'center',
-              { win = 'input', height = 1, border = 'bottom' },
-              { win = 'list', border = 'none' },
-              {
-                win = 'preview',
-                title = '{preview}',
-                height = 0.4,
-                border = 'top',
-              },
-            },
-          },
-        },
-      },
+      picker = { enable = true },
       explorer = { enable = true },
       bufdelete = { enabled = true },
     },
@@ -485,54 +316,8 @@ require('lazy').setup({
         section_separators = { left = '', right = '' },
         globalstatus = true,
       },
-      sections = {
-        lualine_a = { 'mode' },
-        lualine_b = {
-          { 'filetype', icon_only = true },
-          {
-            'filename',
-            symbols = { modified = ' ', readonly = ' ' },
-          },
-        },
-        lualine_c = {},
-        lualine_x = {
-          'diagnostics',
-          {
-            function()
-              local clients = vim.lsp.get_clients()
-  
-              if next(clients) == nil then
-                return 'No LSP'
-              end
-  
-              for _, client in ipairs(clients) do
-                local filetypes = client.config.filetypes
-                if
-                  filetypes and vim.fn.index(filetypes, vim.bo.filetype) ~= -1
-                then
-                  return client.name
-                end
-              end
-  
-              return 'No LSP'
-            end,
-            cond = function()
-              return vim.fn.index(
-                { 'toggleterm', 'snacks_picker_list' },
-                vim.bo.filetype
-              ) == -1
-            end,
-            icon = ' ',
-          },
-        },
-        lualine_y = {
-          { 'searchcount', maxcount = 999, timeout = 120 },
-          { 'branch', icon = '' },
-        },
-        lualine_z = { 'progress', 'location', 'fileformat' },
-      },
     },
   }
 }, {
-  ui = { border = 'single' },
+  ui = { border = 'rounded' },
 })
