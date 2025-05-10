@@ -86,13 +86,39 @@ keyset('n', '<leader>d', vim.diagnostic.open_float)
 -- Spell quick fix
 keyset('i', '<C-l>', '<C-g>u<Esc>[s1z=`]a<C-g>u')
 
+-- Restore cursor position on buffer enter
+vim.api.nvim_create_autocmd('BufReadPost', {
+  command = 'silent! normal g`"zv',
+})
+
+-- Highlight yanked text
+vim.api.nvim_create_augroup('YankHighlight', { clear = true })
 vim.api.nvim_create_autocmd('TextYankPost', {
-  desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = 'YankHighlight',
   callback = function()
-    vim.highlight.on_yank()
+    vim.highlight.on_yank({ higroup = 'Search', timeout = 500 })
   end,
 })
+
+local function alias_with_bang(cmd)
+  return function(args)
+    if args.bang then
+      vim.cmd(cmd .. '!')
+    else
+      vim.cmd(cmd)
+    end
+  end
+end
+
+-- I'm kinda clumsy
+vim.api.nvim_create_user_command('W', alias_with_bang('w'), { bang = true })
+vim.api.nvim_create_user_command('Wa', alias_with_bang('wa'), { bang = true })
+vim.api.nvim_create_user_command('X', alias_with_bang('x'), { bang = true })
+vim.api.nvim_create_user_command('Xa', alias_with_bang('xa'), { bang = true })
+vim.api.nvim_create_user_command('Q', alias_with_bang('q'), { bang = true })
+vim.api.nvim_create_user_command('Qa', alias_with_bang('qa'), { bang = true })
+vim.api.nvim_create_user_command('Bd', alias_with_bang('bd'), { bang = true })
+
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -105,6 +131,10 @@ end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
+  {
+    'tpope/vim-obsession',
+    event = 'VeryLazy',
+  },
   {
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',

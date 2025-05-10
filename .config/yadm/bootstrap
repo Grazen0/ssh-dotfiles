@@ -1,9 +1,34 @@
+#!/usr/bin/env bash
+
 set -euo pipefail
 IFS=$'\n\t'
 
-echo "Updating submodules..."
+echo "Updating submodules... ==================================================="
 yadm submodule update --recursive --init
 
+echo "Adding Docker repository... =============================================="
+
+# Add Docker's official GPG key:
+sudo apt update
+sudo apt install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+echo "Updating packages... ====================================================="
 sudo apt update
 sudo apt upgrade
-sudo apt install --yes git build-essential neovim lazygit lazydocker
+sudo apt install -y git build-essential neovim docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap docker-ce-rootless-extras
+
+echo "Installing Docker rootless... ============================================"
+dockerd-rootless-setuptool.sh install
+
+echo "Enabling systemd services... ============================================="
+systemctl --user enable --now ssh-agent.service
+systemctl --user enable --now docker.service

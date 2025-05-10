@@ -3,6 +3,7 @@
 
 [core]
     editor = "nvim -f"
+    excludesFile = "~/.config/git/global-gitignore"
 
 [pull]
     rebase = true

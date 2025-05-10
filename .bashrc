@@ -117,4 +117,5 @@ if ! shopt -oq posix; then
 fi
 
 alias v="nvim"
+alias vs="nvim -S"
 alias ta="tmux attach"
