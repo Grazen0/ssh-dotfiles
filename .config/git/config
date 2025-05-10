@@ -1,0 +1,12 @@
+[init]
+    defaultBranch = main
+
+[core]
+    editor = "nvim -f"
+
+[pull]
+    rebase = true
+
+[user]
+    email = "josedanielgrayson@proton.me"
+    name = "José Daniel Grayson"

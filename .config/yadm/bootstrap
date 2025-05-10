@@ -1,0 +1,9 @@
+set -euo pipefail
+IFS=$'\n\t'
+
+echo "Updating submodules..."
+yadm submodule update --recursive --init
+
+sudo apt update
+sudo apt upgrade
+sudo apt install --yes git build-essential neovim lazygit lazydocker
