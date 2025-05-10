@@ -119,3 +119,4 @@ fi
 alias v="nvim"
 alias vs="nvim -S"
 alias ta="tmux attach"
+alias lg="lazygit"

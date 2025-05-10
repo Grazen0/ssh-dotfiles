@@ -10,6 +10,7 @@ echo "Adding Docker repository... ==============================================
 
 # Add Docker's official GPG key:
 sudo apt update
+
 sudo apt install ca-certificates curl
 sudo install -m 0755 -d /etc/apt/keyrings
 sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -24,11 +25,27 @@ echo \
 echo "Updating packages... ====================================================="
 sudo apt update
 sudo apt upgrade
-sudo apt install -y git build-essential neovim docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap docker-ce-rootless-extras
+sudo apt install -y git build-essential neovim docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin dbus-user-session uidmap docker-ce-rootless-extras docker-compose-plugin
 
 echo "Installing Docker rootless... ============================================"
 dockerd-rootless-setuptool.sh install
 
+if ! [ command -v lazygit &>/dev/null ]; then
+    echo "Installing Lazygit... ===================================================="
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | \grep -Po '"tag_name": *"v\K[^"]*')
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    sudo install lazygit -D -t /usr/local/bin/
+    rm -rf lazygit.tar.gz lazygit
+fi
+
+if ! [ command -v lazydocker &>/dev/null ]; then
+    echo "Installing Lazydocker... ================================================="
+    curl https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh | bash
+fi
+
 echo "Enabling systemd services... ============================================="
 systemctl --user enable --now ssh-agent.service
 systemctl --user enable --now docker.service
+
+echo "All done!"
