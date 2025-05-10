@@ -136,6 +136,26 @@ require('lazy').setup({
     event = 'VeryLazy',
   },
   {
+    'kylechui/nvim-surround',
+    event = { 'BufReadPre', 'BufNewFile' },
+    opts = {},
+  },
+  {
+    'numToStr/comment.nvim',
+    event = 'InsertEnter',
+    opts = {},
+  },
+  {
+    'windwp/nvim-autopairs',
+    event = 'InsertEnter',
+    opts = {},
+  },
+  {
+    'nvim-pack/nvim-spectre',
+    cmd = 'Spectre',
+    opts = {},
+  },
+  {
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
     dependencies = {
